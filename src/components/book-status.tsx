@@ -10,7 +10,7 @@ type StatusPanelProps = {
 	detail: string
 }
 
-export function LoadingPanel({ attempt, detail }: StatusPanelProps) {
+export function LoadingPanel({ attempt, detail }: Readonly<StatusPanelProps>) {
 	return (
 		<Paper withBorder radius="md" p="md" mih={210}>
 			<Stack gap="sm">

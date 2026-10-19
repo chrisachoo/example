@@ -9,12 +9,31 @@ import {
 	Text,
 	Title
 } from "@mantine/core"
-import { Suspense, use, useState } from "react"
+import { Suspense, use, useEffect, useState } from "react"
 
 import { BookDetails, ErrorPanel, LoadingPanel } from "@/components/book-status"
 import { ErrorBoundary } from "@/components/error-boundary"
-import { getBookRequest, type FetchOutcome } from "@/lib/simulate-book"
+import {
+	getBookRequest,
+	simulatedErrorMessage,
+	type FetchOutcome
+} from "@/lib/simulate-book"
 import { useIsClient } from "@/lib/use-is-client"
+
+// React logs a caught render error with console.error. The Pages Router dev
+// overlay treats that log as an unhandled crash. This rejection is the demo's
+// failure path, so the card's error boundary is the UI for it.
+function withoutSimulatedErrorOverlay(report: typeof console.error) {
+	return (...args: unknown[]) => {
+		const simulated = args.some(
+			(arg) => arg instanceof Error && arg.message === simulatedErrorMessage
+		)
+		if (simulated) {
+			return
+		}
+		report(...args)
+	}
+}
 
 const suspenseDetail =
 	"Suspense is showing this fallback while the Promise is pending. The reader is not rendering yet."
@@ -22,10 +41,10 @@ const suspenseDetail =
 function BookReader({
 	attempt,
 	outcome
-}: {
+}: Readonly<{
 	attempt: number
 	outcome: FetchOutcome
-}) {
+}>) {
 	// use() reads the Promise during render. A pending Promise suspends this
 	// component. A rejection throws to the error boundary above Suspense.
 	const book = use(getBookRequest(attempt, outcome))
@@ -43,6 +62,14 @@ export function UseFetchDemo() {
 	const isClient = useIsClient()
 	const [attempt, setAttempt] = useState(1)
 	const [outcome, setOutcome] = useState<FetchOutcome>("success")
+
+	useEffect(() => {
+		const report = console.error
+		console.error = withoutSimulatedErrorOverlay(report) as typeof console.error
+		return () => {
+			console.error = report
+		}
+	}, [])
 
 	function run(nextOutcome: FetchOutcome) {
 		const nextAttempt = attempt + 1
@@ -107,11 +134,6 @@ export function UseFetchDemo() {
 						Simulate a failure
 					</Button>
 				</Group>
-				<Text size="xs" c="dimmed">
-					In development, Next.js logs a rejected render and may open its error
-					overlay. Close the overlay to read the fallback in this card. A
-					production server does not show that overlay.
-				</Text>
 
 				<div aria-live="polite">
 					{isClient ? (
