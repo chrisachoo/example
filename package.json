@@ -1,48 +1,50 @@
 {
-  "name": "example",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "fmt:check": "oxfmt --check",
-    "fmt": "oxfmt",
-    "lint:fix": "oxlint --fix",
-    "lint": "oxlint",
-    "prepare": "husky"
-  },
-  "dependencies": {
-    "next": "16.4.2",
-    "react": "19.3.0",
-    "react-dom": "19.3.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "@types/react-dom": "^19",
-    "@types/react": "^19",
-    "babel-plugin-react-compiler": "1.0.0",
-    "eslint-config-next": "16.4.2",
-    "eslint": "^9",
-    "husky": "^9.1.7",
-    "lint-staged": "^17.6.0",
-    "oxfmt": "^0.74.0",
-    "oxlint": "^1.89.0",
-    "typescript": "^5"
-  },
-  "packageManager": "bun@1.4.2",
-  "ignoreScripts": [
-    "sharp",
-    "unrs-resolver"
-  ],
-  "trustedDependencies": [
-    "sharp",
-    "unrs-resolver"
-  ],
-  "lint-staged": {
-    "*": [
-      "oxlint --fix --no-error-on-unmatched-pattern",
-      "oxfmt --no-error-on-unmatched-pattern"
-    ]
-  }
+	"name": "example",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"fmt:check": "oxfmt --check",
+		"fmt": "oxfmt",
+		"lint:fix": "oxlint --fix",
+		"lint": "oxlint",
+		"prepare": "husky"
+	},
+	"dependencies": {
+		"@mantine/core": "^9.7.3",
+		"@mantine/hooks": "^9.7.3",
+		"next": "16.4.2",
+		"react": "19.3.0",
+		"react-dom": "19.3.0"
+	},
+	"devDependencies": {
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"babel-plugin-react-compiler": "1.0.0",
+		"eslint": "^9",
+		"eslint-config-next": "16.4.2",
+		"husky": "^9.1.7",
+		"lint-staged": "^17.6.0",
+		"oxfmt": "^0.74.0",
+		"oxlint": "^1.89.0",
+		"typescript": "^5"
+	},
+	"lint-staged": {
+		"*": [
+			"oxlint --fix --no-error-on-unmatched-pattern",
+			"oxfmt --no-error-on-unmatched-pattern"
+		]
+	},
+	"packageManager": "bun@1.4.2",
+	"ignoreScripts": [
+		"sharp",
+		"unrs-resolver"
+	],
+	"trustedDependencies": [
+		"sharp",
+		"unrs-resolver"
+	]
 }
