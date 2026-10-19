@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "fmt:check": "oxfmt --check",
+    "fmt": "oxfmt",
+    "lint:fix": "oxlint --fix",
+    "lint": "oxlint",
+    "prepare": "husky"
   },
   "dependencies": {
     "next": "16.4.2",
@@ -14,14 +18,16 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
-    "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
-    "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react": "^19",
     "babel-plugin-react-compiler": "1.0.0",
-    "eslint": "^9",
     "eslint-config-next": "16.4.2",
-    "tailwindcss": "^4",
+    "eslint": "^9",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
     "typescript": "^5"
   },
   "packageManager": "bun@1.4.2",
@@ -32,5 +38,11 @@
   "trustedDependencies": [
     "sharp",
     "unrs-resolver"
-  ]
+  ],
+  "lint-staged": {
+    "*": [
+      "oxlint --fix --no-error-on-unmatched-pattern",
+      "oxfmt --no-error-on-unmatched-pattern"
+    ]
+  }
 }
