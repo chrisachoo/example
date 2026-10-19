@@ -2,6 +2,7 @@
 	"name": "example",
 	"version": "0.1.0",
 	"private": true,
+	"description": "A small Next.js demo that compares React use with Suspense and useEffect for client-side data fetching.",
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",

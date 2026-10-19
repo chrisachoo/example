@@ -1,40 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# use and useEffect for data fetching
 
-## Getting Started
+A small Next.js demo that loads the same mock catalog entry two ways, so you can see how React `use` and `useEffect` handle a slow request.
 
-First, run the development server:
+Both paths wait 2 seconds. There is no backend. `setTimeout` stands in for network latency.
+
+## What the page shows
+
+The home page has two cards and a comparison.
+
+**Read a Promise with `use`.** The Promise is created outside the reader and cached by attempt. `use` reads it during render. While it is pending, the nearest `<Suspense>` boundary shows the loading panel. A rejection throws into an error boundary. Suspense does not catch errors, start the request, or cache the result.
+
+**Fetch inside `useEffect`.** The effect starts after the component commits. Loading, success, and error are component state, and the component renders a branch for each one. Cleanup clears the timer when the component unmounts or a newer attempt starts.
+
+`use` reads a Promise you already have. `useEffect` starts work after paint. They are not interchangeable.
+
+Use **Fetch again** to repeat the wait, and **Simulate a failure** to compare the error boundary with the stored error state.
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+bun install
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Other scripts:
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+```bash
+bun run lint
+bun run build
+bun start
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+## Where to look
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| File                                   | Role                                                 |
+| -------------------------------------- | ---------------------------------------------------- |
+| `src/pages/index.tsx`                  | Page layout and comparison                           |
+| `src/components/use-fetch-demo.tsx`    | `use`, `<Suspense>`, and the error boundary          |
+| `src/components/effect-fetch-demo.tsx` | `useEffect`, explicit state, and timer cleanup       |
+| `src/lib/simulate-book.ts`             | Mock book, the 2 second delay, and the Promise cache |
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+The UI uses [Mantine](https://mantine.dev/). The app is the Next.js Pages Router with React 19.
