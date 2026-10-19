@@ -1,20 +1,14 @@
 # use and useEffect for data fetching
 
-A small Next.js demo that loads the same mock catalog entry two ways, so you can see how React `use` and `useEffect` handle a slow request.
+Two ways to load the same posts on the client.
 
-Both paths wait 2 seconds. There is no backend. `setTimeout` stands in for network latency.
+**`use`.** A module cache returns one Promise for the posts URL. A child calls `use` with that Promise. While it is pending, the nearest `<Suspense>` boundary shows a skeleton. A rejection is caught by an error boundary. This path does not use `useEffect`.
 
-## What the page shows
+**`useEffect`.** The effect fetches after the component commits, then stores the posts, the loading flag, and the error in state.
 
-The home page has two cards and a comparison.
+The request waits one second, the same pause the React docs add so the loading state stays visible. The list comes from JSONPlaceholder.
 
-**Read a Promise with `use`.** The Promise is created outside the reader and cached by attempt. `use` reads it during render. While it is pending, the nearest `<Suspense>` boundary shows the loading panel. A rejection throws into an error boundary. Suspense does not catch errors, start the request, or cache the result.
-
-**Fetch inside `useEffect`.** The effect starts after the component commits. Loading, success, and error are component state, and the component renders a branch for each one. Cleanup clears the timer when the component unmounts or a newer attempt starts.
-
-`use` reads a Promise you already have. `useEffect` starts work after paint. They are not interchangeable.
-
-Use **Fetch again** to repeat the wait, and **Simulate a failure** to compare the error boundary with the stored error state.
+`/use` is the `use` example on its own. The home page shows both.
 
 ## Run it
 
@@ -25,21 +19,14 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Other scripts:
-
-```bash
-bun run lint
-bun run build
-bun start
-```
-
 ## Where to look
 
-| File                                   | Role                                                 |
-| -------------------------------------- | ---------------------------------------------------- |
-| `src/pages/index.tsx`                  | Page layout and comparison                           |
-| `src/components/use-fetch-demo.tsx`    | `use`, `<Suspense>`, and the error boundary          |
-| `src/components/effect-fetch-demo.tsx` | `useEffect`, explicit state, and timer cleanup       |
-| `src/lib/simulate-book.ts`             | Mock book, the 2 second delay, and the Promise cache |
+| File                                   | Role                              |
+| -------------------------------------- | --------------------------------- |
+| `src/pages/index.tsx`                  | Both examples                     |
+| `src/pages/use.tsx`                    | The `use` example                 |
+| `src/components/use-fetch-demo.tsx`    | `use` and `<Suspense>`            |
+| `src/components/effect-fetch-demo.tsx` | `useEffect` and state             |
+| `src/lib/posts.ts`                     | The request and the Promise cache |
 
 The UI uses [Mantine](https://mantine.dev/). The app is the Next.js Pages Router with React 19.
