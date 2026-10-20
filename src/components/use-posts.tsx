@@ -14,7 +14,7 @@ function PostsReader({
 }
 
 export function UsePosts() {
-	const [postsPromise] = useState(fetchPosts())
+	const [postsPromise] = useState(() => fetchPosts())
 
 	return (
 		<ErrorBoundary fallback={(error) => <PostsError message={error.message} />}>
