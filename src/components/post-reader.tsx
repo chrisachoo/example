@@ -131,16 +131,17 @@ function PostBrowser({
 					</Text>
 				</Group>
 				<Stack gap={2} aria-label="Posts" pb={4}>
-					{posts.map((post) => (
+					{posts.map((post, index) => (
 						<NavLink
 							key={post.id}
 							component="button"
 							type="button"
 							active={post.id === selectedId}
 							label={post.title}
+							bdrs="md"
 							leftSection={
 								<Text size="xs" c="dimmed" w={16}>
-									{post.id}
+									{index + 1}.
 								</Text>
 							}
 							onClick={() => selectPost(post.id)}
