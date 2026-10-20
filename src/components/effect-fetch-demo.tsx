@@ -1,10 +1,8 @@
 import { Button, Group, Loader, Paper, Stack, Text } from "@mantine/core"
 import { useEffect, useState } from "react"
 
-import { DELAY_MS } from "@/lib/delay"
-import { failureMessage, sampleNote, type Note, type Outcome } from "@/lib/note"
-
-const delaySeconds = DELAY_MS / 1000
+import { delayLabel } from "@/lib/delay"
+import { failureMessage, getNote, type Note, type Outcome } from "@/lib/note"
 
 type Status = "loading" | "success" | "error"
 
@@ -18,28 +16,31 @@ export function EffectNoteDemo() {
 	useEffect(() => {
 		let ignore = false
 
-		// The timer is the simulated request. Cleanup clears it when this attempt
-		// is replaced or the component unmounts, so a late timer cannot set state.
-		const timeoutId = setTimeout(() => {
-			if (ignore) {
-				return
-			}
+		// Same getNote as the use example. The effect reads it after commit.
+		// Cleanup ignores a late result when this attempt is replaced.
+		getNote("effect", attempt, outcome).then(
+			(nextNote) => {
+				if (ignore) {
+					return
+				}
 
-			if (outcome === "error") {
+				setNote(nextNote)
+				setErrorMessage(null)
+				setStatus("success")
+			},
+			(error: unknown) => {
+				if (ignore) {
+					return
+				}
+
 				setNote(null)
-				setErrorMessage(failureMessage)
+				setErrorMessage(error instanceof Error ? error.message : failureMessage)
 				setStatus("error")
-				return
 			}
-
-			setNote(sampleNote)
-			setErrorMessage(null)
-			setStatus("success")
-		}, DELAY_MS)
+		)
 
 		return () => {
 			ignore = true
-			clearTimeout(timeoutId)
 		}
 	}, [attempt, outcome])
 
@@ -58,8 +59,7 @@ export function EffectNoteDemo() {
 				<Text fw={600}>status is loading</Text>
 			</Group>
 			<Text size="sm" c="dimmed">
-				This component chose the loader. The timer runs for {delaySeconds}{" "}
-				seconds.
+				This component chose the loader. The request waits {delayLabel}.
 			</Text>
 		</Stack>
 	)
@@ -93,8 +93,8 @@ export function EffectNoteDemo() {
 	return (
 		<Stack gap="md" h="100%">
 			<Text c="dimmed" size="sm">
-				The effect starts after commit. Loading, the note, and the error are
-				state in this component.
+				The effect calls getNote after commit. Loading, the note, and the error
+				are state in this component.
 			</Text>
 			<Group gap="xs">
 				<Button type="button" onClick={() => run("success")}>
@@ -109,7 +109,14 @@ export function EffectNoteDemo() {
 					Simulate a failure
 				</Button>
 			</Group>
-			<Paper withBorder radius="md" p="md" mih={150} aria-live="polite">
+			<Paper
+				withBorder
+				radius="lg"
+				bg="white"
+				p="md"
+				mih={168}
+				aria-live="polite"
+			>
 				{content}
 			</Paper>
 		</Stack>

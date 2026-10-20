@@ -2,10 +2,8 @@ import { Button, Group, Loader, Paper, Stack, Text } from "@mantine/core"
 import { Suspense, use, useState } from "react"
 
 import { ErrorBoundary } from "@/components/error-boundary"
-import { DELAY_MS } from "@/lib/delay"
-import { getNote, type Note, type Outcome } from "@/lib/note"
-
-const delaySeconds = DELAY_MS / 1000
+import { delayLabel } from "@/lib/delay"
+import { getNote, type Note } from "@/lib/note"
 
 export function NoteFallback() {
 	return (
@@ -15,14 +13,16 @@ export function NoteFallback() {
 				<Text fw={600}>Suspense fallback</Text>
 			</Group>
 			<Text size="sm" c="dimmed">
-				The reader is suspended for {delaySeconds} seconds.
+				The Promise is pending. This stays up for {delayLabel}.
 			</Text>
 		</Stack>
 	)
 }
 
-function NoteReader({ notePromise }: Readonly<{ notePromise: Promise<Note> }>) {
-	// use() reads this Promise during render. Pending suspends this component.
+export function NoteReader({
+	notePromise
+}: Readonly<{ notePromise: Promise<Note> }>) {
+	// use reads this Promise during render. Pending suspends this component.
 	// A rejection throws to the error boundary above Suspense.
 	const note = use(notePromise)
 
@@ -38,37 +38,46 @@ function NoteReader({ notePromise }: Readonly<{ notePromise: Promise<Note> }>) {
 }
 
 export function UseNoteDemo() {
+	const [renderCount, setRenderCount] = useState(0)
 	const [attempt, setAttempt] = useState(1)
-	const [notePromise, setNotePromise] = useState(() => getNote(1, "success"))
+	const [notePromise, setNotePromise] = useState(() =>
+		getNote("read", 1, "success")
+	)
 
-	function run(outcome: Outcome) {
+	function rerender() {
+		setRenderCount((current) => current + 1)
+	}
+
+	function fail() {
 		const nextAttempt = attempt + 1
-		// Create the Promise in the click, then store it. The reader only reads it.
-		const nextPromise = getNote(nextAttempt, outcome)
 		setAttempt(nextAttempt)
-		setNotePromise(nextPromise)
+		setNotePromise(getNote("read", nextAttempt, "error"))
+	}
+
+	function retry() {
+		const nextAttempt = attempt + 1
+		setAttempt(nextAttempt)
+		setNotePromise(getNote("read", nextAttempt, "success"))
 	}
 
 	return (
 		<Stack gap="md" h="100%">
 			<Text c="dimmed" size="sm">
-				use reads a Promise during render. This update is urgent, so a pending
-				Promise shows the Suspense fallback.
+				use reads the Promise during render. Re-render passes that same Promise
+				again, so the fallback does not return.
 			</Text>
 			<Group gap="xs">
-				<Button type="button" onClick={() => run("success")}>
-					Refetch
+				<Button type="button" onClick={rerender}>
+					Re-render
 				</Button>
-				<Button
-					type="button"
-					variant="light"
-					color="red"
-					onClick={() => run("error")}
-				>
+				<Button type="button" variant="light" color="red" onClick={fail}>
 					Simulate a failure
 				</Button>
 			</Group>
-			<Paper withBorder radius="md" p="md" mih={150}>
+			<Paper withBorder radius="lg" bg="white" p="md" mih={168}>
+				<Text size="xs" c="dimmed" mb="sm">
+					Re-renders from the button: {renderCount}
+				</Text>
 				{/* A new attempt remounts the boundary so a previous rejection does not stick. */}
 				<ErrorBoundary
 					key={attempt}
@@ -79,7 +88,7 @@ export function UseNoteDemo() {
 								The rejection threw into this error boundary. Suspense does not
 								render errors.
 							</Text>
-							<Button type="button" onClick={() => run("success")}>
+							<Button type="button" onClick={retry}>
 								Try again
 							</Button>
 						</Stack>

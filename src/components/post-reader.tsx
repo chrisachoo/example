@@ -1,7 +1,7 @@
 import {
+	Box,
 	Button,
 	Group,
-	Loader,
 	NavLink,
 	Paper,
 	SimpleGrid,
@@ -10,16 +10,16 @@ import {
 	Text,
 	Title
 } from "@mantine/core"
-import { Suspense, use, useState, useTransition } from "react"
+import { Suspense, use, useState } from "react"
 
 import { ErrorBoundary } from "@/components/error-boundary"
 import { PostListSkeleton } from "@/components/post-list-skeleton"
 import {
 	getPosts,
 	getUser,
+	type Outcome,
 	type Post,
-	type User,
-	type Outcome
+	type User
 } from "@/lib/posts"
 
 type AuthorRequest = {
@@ -46,6 +46,9 @@ function Author({ userPromise }: Readonly<{ userPromise: Promise<User> }>) {
 function AuthorFallback() {
 	return (
 		<Stack gap="xs" aria-busy="true" aria-label="Loading author">
+			<Text size="sm" fw={600}>
+				This box is waiting.
+			</Text>
 			<Skeleton height={14} width="45%" radius="sm" />
 			<Skeleton height={12} width="70%" radius="sm" />
 			<Skeleton height={12} width="55%" radius="sm" />
@@ -59,7 +62,6 @@ function PostBrowser({
 	const posts = use(postsPromise)
 	const [selectedId, setSelectedId] = useState<number | null>(null)
 	const [authorRequest, setAuthorRequest] = useState<AuthorRequest | null>(null)
-	const [isPending, startTransition] = useTransition()
 
 	const selected = posts.find((post) => post.id === selectedId) ?? null
 	const authorForSelected =
@@ -77,21 +79,19 @@ function PostBrowser({
 
 		const attempt =
 			authorRequest?.userId === selected.userId ? authorRequest.attempt + 1 : 1
-		// The Promise is created here. startTransition only marks the update.
+		// The Promise is created in the click. The state update is immediate, so
+		// the author box shows its fallback. The post is outside that boundary.
 		const promise = getUser(selected.userId, attempt, outcome)
-		startTransition(() => {
-			setAuthorRequest({
-				userId: selected.userId,
-				attempt,
-				promise
-			})
+		setAuthorRequest({
+			userId: selected.userId,
+			attempt,
+			promise
 		})
 	}
 
 	let authorSection = (
 		<Text size="sm" c="dimmed">
-			The author loads in this section. The post above sits outside its Suspense
-			boundary.
+			View author loads a Promise in this box. The post above stays.
 		</Text>
 	)
 
@@ -116,27 +116,56 @@ function PostBrowser({
 	}
 
 	return (
-		<SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-			<Stack gap={4} aria-label="Posts">
-				{posts.map((post) => (
-					<NavLink
-						key={post.id}
-						component="button"
-						type="button"
-						active={post.id === selectedId}
-						label={post.title}
-						onClick={() => selectPost(post.id)}
-					/>
-				))}
-			</Stack>
-			<Paper withBorder radius="md" p="md" mih={240}>
+		<SimpleGrid
+			cols={{ base: 1, sm: 2 }}
+			spacing="lg"
+			style={{ alignItems: "start" }}
+		>
+			<Paper withBorder radius="lg" bg="white" p={4}>
+				<Group justify="space-between" px="sm" py="xs">
+					<Text size="sm" fw={650}>
+						Posts
+					</Text>
+					<Text size="xs" c="dimmed">
+						{posts.length} posts
+					</Text>
+				</Group>
+				<Stack gap={2} aria-label="Posts" pb={4}>
+					{posts.map((post) => (
+						<NavLink
+							key={post.id}
+							component="button"
+							type="button"
+							active={post.id === selectedId}
+							label={post.title}
+							leftSection={
+								<Text size="xs" c="dimmed" w={16}>
+									{post.id}
+								</Text>
+							}
+							onClick={() => selectPost(post.id)}
+						/>
+					))}
+				</Stack>
+			</Paper>
+			<Paper
+				withBorder
+				radius="lg"
+				bg="white"
+				p="lg"
+				mih={320}
+				style={{ position: "sticky", top: 76 }}
+			>
 				{selected ? (
 					<Stack gap="md">
-						<Stack gap={4}>
-							<Title order={2} size="h4">
+						<Stack gap={6}>
+							<Text size="xs" c="dimmed" fw={650}>
+								Post {selected.id}
+							</Text>
+							<Title order={2} size="h3">
 								{selected.title}
 							</Title>
-							<Text>{selected.body}</Text>
+							<Text lh={1.6}>{selected.body}</Text>
 						</Stack>
 						<Group gap="xs">
 							<Button type="button" onClick={() => showAuthor("success")}>
@@ -154,24 +183,37 @@ function PostBrowser({
 								<Button
 									type="button"
 									variant="subtle"
+									color="gray"
 									onClick={() => setAuthorRequest(null)}
 								>
 									Back to post
 								</Button>
 							) : null}
 						</Group>
-						{isPending ? (
-							<Group gap="xs">
-								<Loader size="xs" />
-								<Text size="sm">
-									Transition pending. The post above stays mounted.
+						<Box
+							p="md"
+							bg="white"
+							style={{
+								borderRadius: "var(--mantine-radius-lg)",
+								border: "1px solid var(--mantine-color-indigo-3)"
+							}}
+						>
+							<Stack gap="xs">
+								<Text fw={650} size="sm" c="indigo.8">
+									Author box
 								</Text>
-							</Group>
-						) : null}
-						{authorSection}
+								{authorSection}
+							</Stack>
+						</Box>
 					</Stack>
 				) : (
-					<Text c="dimmed">Select a post to read it.</Text>
+					<Stack align="center" justify="center" mih={260} gap={6}>
+						<Text fw={650}>Select a post</Text>
+						<Text size="sm" c="dimmed" ta="center" maw={280}>
+							The list stays on the left. The author loads only inside the box
+							on this card.
+						</Text>
+					</Stack>
 				)}
 			</Paper>
 		</SimpleGrid>

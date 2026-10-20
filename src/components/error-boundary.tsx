@@ -3,9 +3,10 @@ import { Component, type ReactNode } from "react"
 import { failureMessage } from "@/lib/note"
 import { authorFailureMessage } from "@/lib/posts"
 
-// React logs a caught render error with console.error. The Pages Router dev
-// overlay treats that log as an unhandled crash and covers the page. These two
-// rejections are the demo's failure path, so the error boundary is the UI.
+// Demo wiring for the Pages Router overlay. It is not part of use.
+// React logs a caught render error with console.error, and the overlay treats
+// that log as a crash. The boundary below is the error UI. This filter hides
+// only the two failures these demos trigger on purpose.
 if (typeof window !== "undefined") {
 	const report = console.error.bind(console)
 	console.error = (...args: unknown[]) => {

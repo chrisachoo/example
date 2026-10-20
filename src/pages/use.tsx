@@ -1,10 +1,12 @@
-import { Anchor, Container, Stack, Text, Title } from "@mantine/core"
+import { Stack, Text, Title } from "@mantine/core"
 import dynamic from "next/dynamic"
 import Head from "next/head"
-import Link from "next/link"
 
+import { PageFrame } from "@/components/page-frame"
 import { PostListSkeleton } from "@/components/post-list-skeleton"
 
+// Pages Router wiring. The lesson reads a Promise during render, so the server
+// skips this tree and the client shows the skeleton first.
 const PostLesson = dynamic(
 	() => import("@/components/post-reader").then((mod) => mod.PostLesson),
 	{
@@ -17,32 +19,25 @@ export default function UsePage() {
 	return (
 		<>
 			<Head>
-				<title>Posts and startTransition</title>
+				<title>Only this box waits</title>
 			</Head>
-			<Container component="main" size="lg" py="xl">
+			<PageFrame>
 				<Stack gap="xl">
-					<Stack gap="sm">
-						<Anchor component={Link} href="/" w="fit-content">
-							Back to the comparison
-						</Anchor>
-						<Title order={1}>Posts, then the author</Title>
-						<Text maw={720}>
-							The list is a Promise read with use. Open a post, then view its
-							author. The click creates the user Promise. startTransition marks
-							the state update that reveals it. startTransition does not fetch,
-							and it does not by itself hide a Suspense fallback.
+					<Stack gap="xs" maw={720}>
+						<Title order={1}>Only this box waits</Title>
+						<Text>
+							Open a post, then view its author. The list has ten posts. The
+							author is a second Promise, read with use inside the author box.
+							The post stays because it sits outside that box.
 						</Text>
-						<Text maw={720} c="dimmed">
-							The pending line is isPending from useTransition. The post stays
-							mounted because it sits outside the author boundary.
-							startTransition does not decide that on its own. This update is a
-							transition, so React keeps the current author section until the
-							user Promise settles, instead of replacing the post.
+						<Text c="dimmed" size="sm">
+							Fail author rejects the Promise. The error stays in the box. The
+							list and the post stay mounted.
 						</Text>
 					</Stack>
 					<PostLesson />
 				</Stack>
-			</Container>
+			</PageFrame>
 		</>
 	)
 }
