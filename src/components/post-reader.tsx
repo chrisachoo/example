@@ -23,7 +23,7 @@ import {
 } from "@/lib/posts"
 
 type AuthorRequest = {
-	userId: number
+	userId: string
 	attempt: number
 	promise: Promise<User>
 }
@@ -60,14 +60,14 @@ function PostBrowser({
 	postsPromise
 }: Readonly<{ postsPromise: Promise<Post[]> }>) {
 	const posts = use(postsPromise)
-	const [selectedId, setSelectedId] = useState<number | null>(null)
+	const [selectedId, setSelectedId] = useState<string | null>(null)
 	const [authorRequest, setAuthorRequest] = useState<AuthorRequest | null>(null)
 
 	const selected = posts.find((post) => post.id === selectedId) ?? null
 	const authorForSelected =
 		authorRequest?.userId === selected?.userId ? authorRequest : null
 
-	function selectPost(id: number) {
+	function selectPost(id: string) {
 		setSelectedId(id)
 		setAuthorRequest(null)
 	}

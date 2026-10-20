@@ -153,3 +153,41 @@ export function getUser(
 	usersByKey.set(key, promise)
 	return promise
 }
+
+export const postsUrl = "https://jsonplaceholder.typicode.com/posts?_limit=10"
+
+export const postsFailureMessage = "Failed to fetch posts."
+
+// Shared by the use and useEffect readers so both waits look the same.
+const postsDelayMs = 10_000
+
+type RemotePost = {
+	userId: number
+	id: number
+	title: string
+	body: string
+}
+
+function wait(ms: number) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms)
+	})
+}
+
+export async function fetchPosts(): Promise<Post[]> {
+	const request = fetch(postsUrl).then(async (response) => {
+		if (!response.ok) {
+			throw new Error(postsFailureMessage)
+		}
+
+		const posts = (await response.json()) as RemotePost[]
+		return posts.map((post) => ({
+			id: String(post.id),
+			userId: String(post.userId),
+			title: post.title,
+			body: post.body
+		}))
+	})
+
+	return Promise.all([request, wait(postsDelayMs)]).then(([posts]) => posts)
+}

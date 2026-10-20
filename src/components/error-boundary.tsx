@@ -1,12 +1,12 @@
 import { Component, type ReactNode } from "react"
 
 import { failureMessage } from "@/lib/note"
-import { authorFailureMessage } from "@/lib/posts"
+import { authorFailureMessage, postsFailureMessage } from "@/lib/posts"
 
 // Demo wiring for the Pages Router overlay. It is not part of use.
 // React logs a caught render error with console.error, and the overlay treats
 // that log as a crash. The boundary below is the error UI. This filter hides
-// only the two failures these demos trigger on purpose.
+// only the failures these demos trigger on purpose.
 if (typeof window !== "undefined") {
 	const report = console.error.bind(console)
 	console.error = (...args: unknown[]) => {
@@ -16,8 +16,10 @@ if (typeof window !== "undefined") {
 		const expected =
 			text.includes(failureMessage) ||
 			text.includes(authorFailureMessage) ||
+			text.includes(postsFailureMessage) ||
 			text.includes("occurred in the <NoteReader> component") ||
-			text.includes("occurred in the <Author> component")
+			text.includes("occurred in the <Author> component") ||
+			text.includes("occurred in the <PostsReader> component")
 		if (expected) {
 			return
 		}

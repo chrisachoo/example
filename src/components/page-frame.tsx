@@ -5,7 +5,8 @@ import type { ReactNode } from "react"
 
 const links = [
 	{ href: "/", label: "Examples" },
-	{ href: "/use", label: "One box" }
+	{ href: "/use", label: "One box" },
+	{ href: "/demo", label: "Demo" }
 ]
 
 export function SiteHeader() {
