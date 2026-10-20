@@ -2,7 +2,7 @@
 	"name": "example",
 	"version": "0.1.0",
 	"private": true,
-	"description": "A small Next.js demo that compares React use with Suspense and useEffect for client-side data fetching.",
+	"description": "A small Next.js demo of React use for a Promise and for context, compared with useEffect.",
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
@@ -14,11 +14,13 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
+		"@mantine/code-highlight": "^9.7.3",
 		"@mantine/core": "^9.7.3",
 		"@mantine/hooks": "^9.7.3",
 		"next": "16.4.2",
 		"react": "19.3.0",
-		"react-dom": "19.3.0"
+		"react-dom": "19.3.0",
+		"shiki": "^4.5.0"
 	},
 	"devDependencies": {
 		"@types/node": "^20",
