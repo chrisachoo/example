@@ -74,6 +74,36 @@ const mockPosts: Post[] = [
 		userId: 3,
 		title: "Closing the day book",
 		body: "The day book closes when the last note is signed. Nothing here waits on a server."
+	},
+	{
+		id: 6,
+		userId: 3,
+		title: "A margin left open",
+		body: "Someone penciled a total beside the printed one. The pencil total is the one that matches the crates."
+	},
+	{
+		id: 7,
+		userId: 1,
+		title: "Wind on the second ridge",
+		body: "The second ridge marker was face down. The first three were still standing when the log was closed."
+	},
+	{
+		id: 8,
+		userId: 2,
+		title: "Crates that came back",
+		body: "Four crates returned with the afternoon wagon. Their labels match the quieter inventory from the morning."
+	},
+	{
+		id: 9,
+		userId: 3,
+		title: "The unsigned line",
+		body: "One line in the day book has no signature. The figures above it were already checked."
+	},
+	{
+		id: 10,
+		userId: 1,
+		title: "Markers after the rain",
+		body: "Rain softened the chalk on two markers. The carved numbers underneath were still readable."
 	}
 ]
 

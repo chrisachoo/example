@@ -11,18 +11,22 @@ export type Note = {
 export const sampleNote: Note = {
 	title: "Northwind Field Notes",
 	author: "Mina Cole",
-	summary:
-		"A local note used by both demos. The delay is a timer, not a server."
+	summary: "A local note. The delay is a timer, so the wait stays visible."
 }
 
 export const failureMessage = "The request failed after the simulated delay."
 
-// One Promise per attempt. A new Promise on every render would suspend forever,
-// because React retries a suspended render from scratch.
+// One Promise per scope, attempt, and outcome. Each demo passes its own scope,
+// so the examples do not share a timer. A new Promise on every render would
+// suspend forever, because React retries a suspended render from scratch.
 const notes = new Map<string, Promise<Note>>()
 
-export function getNote(attempt: number, outcome: Outcome): Promise<Note> {
-	const key = `${attempt}:${outcome}`
+export function getNote(
+	scope: string,
+	attempt: number,
+	outcome: Outcome
+): Promise<Note> {
+	const key = `${scope}:${attempt}:${outcome}`
 	const cached = notes.get(key)
 	if (cached) {
 		return cached
@@ -35,7 +39,10 @@ export function getNote(attempt: number, outcome: Outcome): Promise<Note> {
 				return
 			}
 
-			resolve(sampleNote)
+			resolve({
+				...sampleNote,
+				summary: `Attempt ${attempt}. The delay is a timer, so the wait stays visible.`
+			})
 		}, DELAY_MS)
 	})
 
